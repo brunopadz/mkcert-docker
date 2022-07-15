@@ -1,8 +1,13 @@
-FROM golang:1.12-alpine
+FROM alpine:3.15.4 AS build
 
-RUN apk --no-cache add git
+WORKDIR /mkcert
 
-RUN go get -u github.com/FiloSottile/mkcert
+RUN apk --no-cache add curl
+RUN curl -JLO "https://dl.filippo.io/mkcert/v1.4.4?for=linux/amd64" && \
+  chmod +x mkcert-v1.4.4-linux-amd64
 
-CMD ["mkcert"]
+FROM scratch
 
+COPY --from=build /mkcert/mkcert-v1.4.4-linux-amd64  ./mkcert
+
+CMD ["./mkcert"]
